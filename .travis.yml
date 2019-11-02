@@ -1,9 +1,25 @@
+language: generic
+
 sudo: required
 services: 
   - docker
 
 before_install:
-  - docker build -t docker-react -f Dockerfile.dev .
+  - docker build -t m-monson/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run -e CI=true docker-react npm run test -- --coverage
+  - docker run -e CI=true m-monson/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t m-monson/multi-client ./client
+  - docker build -t m-monson/multi-nginx ./nginx
+  - docker build -t m-monson/multi-server ./server
+  - docker build -t m-monson/multi-worker ./worker
+
+  # login to the docker CLI username markmonson
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # take those images and push them to dockerhub 
+  - docker push m-monson/multi-client
+  - docker push m-monson/multi-nginx
+  - docker push m-monson/multi-server
+  - docker push m-monson/multi-worker
