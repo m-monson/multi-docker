@@ -16,9 +16,8 @@ after_success:
   - docker build -t m-monson/multi-server ./server
   - docker build -t m-monson/multi-worker ./worker
 
-  # login to the docker CLI username markmonson
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # take those images and push them to dockerhub 
+
   - docker push m-monson/multi-client
   - docker push m-monson/multi-nginx
   - docker push m-monson/multi-server
